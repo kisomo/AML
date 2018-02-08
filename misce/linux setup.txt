@@ -1,0 +1,57 @@
+Step 1 : install pip
+
+https://linuxconfig.org/installation-of-pip-the-python-packaging-tool-on-rhel-7-linux
+
+[root@rhel7 ~]# wget https://pypi.python.org/packages/source/s/setuptools/setuptools-7.0.tar.gz --no-check-certificate
+[root@rhel7 ~]# tar xzf setuptools-7.0.tar.gz
+[root@rhel7 ~]# cd setuptools-7.0
+[root@rhel7 ~]# python setup.py install
+[root@rhel7 ~]# wget https://bootstrap.pypa.io/get-pip.py
+[root@rhel7 ~]# python get-pip.py
+[root@rhel7 ~]# pip --version
+
+
+
+
+
+
+Step2: install packages
+
+Sudo Pip install numpy
+Sudo Pip install scipy
+Sudo Pip install pandas
+Sudo Pip install scikit-learn
+Sudo Pip install matplotlib
+Sudo Pip install tensorflow
+Sudo Pip install keras
+
+
+
+
+Step3: install python3
+
+https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-centos-7
+follow the commands
+
+
+
+
+
+
+
+step 3 a: install epel-release
+
+https://support.rackspace.com/how-to/install-epel-and-additional-repositories-on-centos-and-red-hat/
+
+
+
+
+
+
+step 4: configure python3 correctly
+https://www.cyberciti.biz/faq/bash-python-command-not-found/
+
+run “type -a python” and see the path /usr/bin/python
+then run
+
+ sudo ln -s /usr/bin/python3.4 /usr/bin/python
