@@ -5,35 +5,24 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer 
 
 #The object returned by `load_breast_cancer()` is a scikit-learn Bunch object, which is similar to a dictionary. 
-
 cancer = load_breast_cancer() 
-
 #Print the cancer keys 
-
 print(cancer.keys()) 
-
 #Answer: ['target_names', 'data', 'target', 'DESCR', 'feature_names'] 
-
 print(cancer.DESCR) 
-
 # Print the data set description 
-
 
 ####################### QUESTION 0 
 ######################################################################### 
-
 def answer_zero(): 
     return len(cancer['feature_names']) 
 
 print(answer_zero())
 
-#ANSWER: 0 
-
 ####################### QUESTION 1 
 ######################################################################### 
 
 def answer_one(): 
-
     """converts the sklearn 'cancer' bunch
     Returns:
     pandas.DataFrame: cancer data
@@ -43,18 +32,14 @@ def answer_one():
     return pandas.DataFrame(data, columns=columns) 
 
 frame = answer_one() 
-
 print(frame.shape)
 print(frame.tail(3))
-
 #Answer: (569, 31) 
-
 print(frame.describe())
 
 
 ####################### QUESTION 2 
 ######################################################################### 
-
 def answer_two(): 
     """calculates number of malignent and benign
     Returns:
@@ -69,10 +54,8 @@ def answer_two():
     #second is the number of ones (benign) 
     counts.index = "malignant benign".split() 
     #splits the two values in 'counts' into two indexed categories. 
-
     return counts 
 output = answer_two() 
-
 print(output.malignant)
 print (output.benign)
 
@@ -89,22 +72,14 @@ def answer_three():
     """ 
     cancerdf = answer_one() 
     X = cancerdf[cancerdf.columns[:-1]] 
-
     # X is all of cancer data but the last two columns. 
-
     y = cancerdf.target 
-
     # target is the label for the last column 
-
     return X, y 
 x, y = answer_three() 
-
 print(x.shape)
-
 #Answer: (569, 30) 
-
 print(y.shape)
-
 #Answer: (569,) 
 
 ####################### QUESTION 4 
@@ -112,7 +87,6 @@ print(y.shape)
 
 #from sklearn.model_selection import train_test_split 
 from sklearn.cross_validation import train_test_split
-
 def answer_four(): 
    """splits data into training and testing sets
    Returns:
@@ -133,16 +107,13 @@ def answer_five():
     Returns:
     sklearn.neighbors.KNeighborsClassifier: trained data
     """ 
-
     X_train, X_test, y_train, y_test = answer_four() 
     model = KNeighborsClassifier(n_neighbors=3) 
     model.fit(X_train, y_train) 
     return model 
 
 knn = answer_five() 
-
 print(knn)
-
 
 ####################### QUESTION 6 
 
@@ -170,7 +141,6 @@ def answer_six():
     return model.predict(means) 
 
 predict_mean = answer_six() 
-
 print(predict_mean) 
 
 #Answer: [ 1.] 
@@ -189,10 +159,7 @@ def answer_seven():
 
 predictions = answer_seven() 
 print(predictions)
-
-
 print("no cancer: {0}".format(len(predictions[predictions==0]))) 
-
 print("cancer: {0}".format(len(predictions[predictions==1]))) 
 # no cancer: 51 
 # cancer: 92 
@@ -239,7 +206,6 @@ def accuracy_plot():
 
     scores = [knn.score(mal_train_X, mal_train_y), knn.score(ben_train_X, ben_train_y), knn.score(mal_test_X, mal_test_y), knn.score(ben_test_X, ben_test_y )] 
 
-
     plt.figure() 
     # Plot the scores as a bar chart 
     bars = plt.bar(np.arange(4), scores, color=['#4c72b0','#4c72b0','#55a868', '#55a868']) 
@@ -270,16 +236,6 @@ accuracy_plot()
 
 
 
-x = "115tthg"
-
-try:
-    y = float(x)
-except Exception as e:
-    print(e)
-    
-    
-print("value of y is ", y)
-
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import numpy as np
@@ -300,14 +256,16 @@ from sklearn.neighbors import KNeighborsClassifier
 model = KNeighborsClassifier(n_neighbors=24) 
 model.fit(X_train, y_train) 
 model.predict(X_test) 
-model.score(X_test, y_test) 
+print(model.score(X_test, y_test))
 
 
 from sklearn.neighbors.nearest_centroid import NearestCentroid
 clf = NearestCentroid()
 clf.fit(X_train, y_train)
+res = clf.predict(X_test)
 print(clf.predict(X_test))
 print(clf.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != res).sum()))
 
 
 from sklearn.cluster import KMeans
@@ -317,8 +275,9 @@ kmeans.predict(X_test)
 res = kmeans.predict(X_test)
 kmeans.cluster_centers_
 #print(kmeans.score(res,y_test))
-plt.scatter(X_train, c=res, s=40, cmap='viridis')
-
+print(res)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != res).sum()))
+#plt.scatter(X_train, c=res, s=40, cmap='viridis')
 
 
 from sklearn.naive_bayes import GaussianNB
@@ -333,6 +292,7 @@ SVC_model = SVC(kernel = 'rbf', C = 10, gamma = 10)
 SVC_model = SVC_model.fit(X_train, y_train)
 y_pred = SVC_model.predict(X_test)
 print(SVC_model.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
 
 
 from sklearn.tree import DecisionTreeClassifier
@@ -341,6 +301,7 @@ dt = DecisionTreeClassifier(max_depth=6).fit(X_train, y_train)
 tree_predicted = dt.predict(X_test)
 confusion = confusion_matrix(y_test, tree_predicted)
 print(dt.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != tree_predicted).sum()))
 
 
 from sklearn.linear_model import LogisticRegression
@@ -349,6 +310,7 @@ lr = lr.fit(X_train, y_train)
 lr_predicted = lr.predict(X_test)
 confusion = confusion_matrix(y_test, lr_predicted)
 print(lr.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != lr_predicted).sum()))
 
 
 from sklearn.linear_model import Ridge
@@ -361,6 +323,7 @@ linridge = linridge.fit(X_train_scaled, y_train)
 linridge_predicted = linridge.predict(X_test)
 #confusion = confusion_matrix(y_test, linridge_predicted)
 print(linridge.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != linridge_predicted).sum()))
 
 
 from sklearn.linear_model import Lasso
@@ -387,6 +350,7 @@ clf = clf.fit(X_train, y_train)
 clf_predicted = clf.predict(X_test)
 #confusion = confusion_matrix(y_test, clf_predicted)
 print(clf.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != clf_predicted).sum()))
 
 
 from sklearn.ensemble import GradientBoostingClassifier
@@ -395,6 +359,7 @@ clf = clf.fit(X_train, y_train)
 clf_predicted = clf.predict(X_test)
 #confusion = confusion_matrix(y_test, clf_predicted)
 print(clf.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != clf_predicted).sum()))
 
 
 
@@ -410,24 +375,26 @@ print(clf.score(X_test,y_test))
 
 
 
-import scipy.stats as stats
-import statsmodels.api as sm
-glm_reg = sm.GLM(y_train, X_train, family=sm.families.Binomial())
-glm_model = glm_reg.fit()
-y_pred = glm_model.predict(X_test)
-print(glm_model.score(X_test,y_test))
+
+#import scipy.stats as stats
+#import statsmodels.api as sm
+#glm_reg = sm.GLM(y_train, X_train, family=sm.families.Binomial())
+#glm_model = glm_reg.fit()
+#y_pred = glm_model.predict(X_test)
+#print(glm_model.score(X_test,y_test))
+#print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != clf_predicted).sum()))
 
 
 
-from sklearn.neural_network import  MLPRegressor
-MLP_model = MLPRegressor(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(50, 50, 50), random_state=1)
+from sklearn.neural_network import  MLPRegressor, MLPClassifier
+MLP_model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(50, 50, 50), random_state=1)
 MLP_model.fit(X_train, y_train)
 y_pred = MLP_model.predict(X_test)
 print(MLP_model.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
 
 
-
-
+'''
 from sklearn.mixture import GaussianMixture
 gmm = GaussianMixture(n_components=2)
 gmm.fit(X_train)
@@ -445,6 +412,7 @@ plt.show()
 https://github.com/jakevdp/ESAC-stats-2014/blob/master/notebooks/05.3-Density-GMM.ipynb
 
 
+
 from sklearn.mixture import GMM
 from scipy import stats
 clf = GMM(4, n_iter=500, random_state=3)
@@ -456,9 +424,8 @@ plt.plot(xpdf, density, '-r')
 plt.xlim(-1, 1);
 
 
-
 https://jakevdp.github.io/PythonDataScienceHandbook/05.12-gaussian-mixtures.html
-
+'''
 
 # Generate some data
 from sklearn.datasets.samples_generator import make_blobs
@@ -477,7 +444,8 @@ print(X[len(X)-3:,:])
 from sklearn.cluster import KMeans
 kmeans = KMeans(4, random_state=0)
 labels = kmeans.fit(X).predict(X)
-plt.scatter(X[:, 0], X[:, 1], c=labels, s=40, cmap='viridis');
+plt.scatter(X[:, 0], X[:, 1], c=labels, s=40, cmap='viridis')
+plt.show()
 #plot
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
@@ -496,6 +464,7 @@ def plot_kmeans(kmeans, X, n_clusters=4, rseed=0, ax=None):
              for i, center in enumerate(centers)]
     for c, r in zip(centers, radii):
         ax.add_patch(plt.Circle(c, r, fc='#CCCCCC', lw=3, alpha=0.5, zorder=1))
+
 
 
 kmeans = KMeans(n_clusters=4, random_state=0)
