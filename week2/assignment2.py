@@ -14,7 +14,8 @@ print(np.linspace(0,10,n))  #TM
 print(np.random.randn(n)/5)  #TM
 print(x)  #TM
 import matplotlib.pyplot as plt #TM
-plt.plot(x,y,'r--',x,y2,'bs',x,y3,'g^')  #TM
+#plt.plot(x,y, 'r--',x,y2,'bs',x,y3,'g^')  #TM
+plt.plot(x,y,x,y2,x,y3,linewidth=2)  #TM
 plt.xlabel("x")  #TM
 plt.ylabel("y")  #TM
 plt.axis([0,15,-1,3])  #TM
@@ -34,6 +35,7 @@ def part1_scatter():
     plt.scatter(X_train, y_train, label='training data')
     plt.scatter(X_test, y_test, label='test data')
     plt.legend(loc=4)
+    plt.show()
     
     
 # Uncomment the function below to visualize the data, but be sure 
@@ -42,15 +44,16 @@ part1_scatter()
 
 
 # ### Question 1
-# Write a function that fits a polynomial LinearRegression model on the *training data* `X_train` for degrees 1, 3, 6, and 9. (Use PolynomialFeatures in sklearn.preprocessing to create the polynomial features and then fit a linear regression model) For each model, find 100 predicted values over the interval x = 0 to 10 (e.g. `np.linspace(0,10,100)`) and store this in a numpy array. The first row of this array should correspond to the output from the model trained on degree 1, the second row degree 3, the third row degree 6, and the fourth row degree 9.
-# 
-# <img src="readonly/polynomialreg1.png" style="width: 1000px;"/>
+# Write a function that fits a polynomial LinearRegression model on the *training data* `X_train` for degrees 1, 3, 6, and 9.
+# (Use PolynomialFeatures in sklearn.preprocessing to create the polynomial features and then fit a linear regression model) 
+#For each model, find 100 predicted values over the interval x = 0 to 10 (e.g. `np.linspace(0,10,100)`) 
+#and store this in a numpy array. The first row of this array should correspond to the output from the model 
+#trained on degree 1, the second row degree 3, the third row degree 6, and the fourth row degree 9.
 # 
 # The figure above shows the fitted models plotted on top of the original data (using `plot_one()`).
-# 
-# <br>
 # *This function should return a numpy array with shape `(4, 100)`*
 
+'''
 def answer_one():
     from sklearn.linear_model import LinearRegression
     from sklearn.preprocessing import PolynomialFeatures
@@ -58,24 +61,24 @@ def answer_one():
     # Your code here
     
     _output = np.zeros((4,100),dtype = np.float64) #TM
-    x_input = x #np.linspace(0,10,100) #TM
+    x_input = np.linspace(0,10,100) #x #TM
     x_input = x_input.reshape(100,1) #TM
     
     j = 0 #TM
     for k in [1, 3, 6, 9]: #TM
         poly = PolynomialFeatures(degree=k) #TM
-        X_poly = poly.fit_transform(x) #TM
-        x_input2 = poly.fit_transform(x_input) #TM
-        X_train1, X_test1, y_train1, y_test1 = train_test_split(X_poly, y, random_state = 0) #TM
-        linreg = LinearRegression().fit(X_train1, y_train1) #TM
-        _output[j,:] = linreg.predict(x_input2)  #TM
+        X_poly = poly.fit_transform(X_train) #TM
+        #x_input2 = poly.fit_transform(x_input) #TM
+        #X_train1, X_test1, y_train1, y_test1 = train_test_split(X_poly, y, random_state = 0) #TM
+        linreg = LinearRegression().fit(X_poly, y_train) #TM
+        _output[j,:] = linreg.predict(x_input)  #TM
         j+=1  #TM
     #return # Return your answer
     return _output #TM
 
 
-_output = answer_one()
-print(_output)
+_outpu = answer_one()
+print(_outpu)
 
 
 import matplotlib.pyplot as plt
@@ -105,11 +108,13 @@ def plot_one(degree_predictions):
 
 plot_one(answer_one())
 
+'''
 
 # ### Question 2
 # 
-# Write a function that fits a polynomial LinearRegression model on the training data `X_train` for degrees 0 through 9. For each model compute the $R^2$ (coefficient of determination) regression score on the training data as well as the the test data, and return both of these arrays in a tuple.
-# 
+# Write a function that fits a polynomial LinearRegression model on the training data `X_train` for degrees 0 through 9.
+# For each model compute the $R^2$ (coefficient of determination) regression score on the training data as well as 
+#the the test data, and return both of these arrays in a tuple.
 # *This function should return one tuple of numpy arrays `(r2_train, r2_test)`. Both arrays should have shape `(10,)`*
 
 
@@ -121,18 +126,16 @@ def answer_two():
     # Your code here
     _output = np.zeros((10,2),dtype = np.float64) #TM
     #x_input = x #np.linspace(0,10,100) #TM
-    #x_input = x_input.reshape(100,1) #TM
-    
-    
+    #x_input = x_input.reshape(100,1) #TM    
     j = 0 #TM
     for k in [0,1,2,3,4,5,6,7,8,9]: #TM
         poly = PolynomialFeatures(degree=k) #TM
-        X_poly = poly.fit_transform(x) #TM
+        X_poly = poly.fit_transform(X_train) #TM
         #x_input2 = poly.fit_transform(x_input) #TM
-        X_train1, X_test1, y_train1, y_test1 = train_test_split(X_poly, y, random_state = 0) #TM
-        linreg = LinearRegression().fit(X_train1, y_train1) #TM
-        _output[j,0] = linreg.score(X_train1, y_train1)  #TM
-        _output[j,1] = linreg.score(X_test1, y_test1)  #TM
+        #X_train1, X_test1, y_train1, y_test1 = train_test_split(X_poly, y, random_state = 0) #TM
+        linreg = LinearRegression().fit(X_poly, y_train) #TM
+        _output[j,0] = linreg.score(X_train, y_train)  #TM
+        _output[j,1] = linreg.score(X_test, y_test)  #TM
         j+=1  #TM
     #return # Return your answer
     return _output #TM
@@ -141,6 +144,7 @@ answer_two()
 scores = answer_two()
 scores
 
+'''
 
 # ### Question 3
 # 
@@ -363,4 +367,4 @@ def answer_seven():
 
 print(answer_seven())
 
-
+'''

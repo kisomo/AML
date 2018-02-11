@@ -80,10 +80,11 @@ from sklearn.datasets import make_regression
 plt.figure()
 plt.title('Sample regression problem with one input variable')
 X_R1, y_R1 = make_regression(n_samples = 100, n_features=1,
-                            n_informative=1, bias = 150.0,
+                            n_informative=1, bias =150.0,
                             noise = 30, random_state=0)
 plt.scatter(X_R1, y_R1, marker= 'o', s=50)
 plt.show()
+
 
 # synthetic dataset for more complex regression
 from sklearn.datasets import make_friedman1
@@ -98,7 +99,8 @@ plt.show()
 # synthetic dataset for classification (binary) 
 plt.figure()
 plt.title('Sample binary classification problem with two informative features')
-X_C2, y_C2 = make_classification(n_samples = 100, n_features=2, n_redundant=0, n_informative=2, n_clusters_per_class=1, flip_y = 0.1, class_sep = 0.5, random_state=0)
+X_C2, y_C2 = make_classification(n_samples = 100, n_features=2, n_redundant=0, n_informative=2,
+ n_clusters_per_class=1, flip_y = 0.1, class_sep = 0.5, random_state=0)
 plt.scatter(X_C2[:, 0], X_C2[:, 1], c=y_C2,
            marker= 'o', s=50, cmap=cmap_bold)
 plt.show()
@@ -112,6 +114,7 @@ plt.figure()
 plt.title('Sample binary classification problem with non-linearly separable classes')
 plt.scatter(X_D2[:,0], X_D2[:,1], c=y_D2, marker= 'o', s=50, cmap=cmap_bold)
 plt.show()
+
 
 # Breast cancer dataset for classification
 cancer = load_breast_cancer()
@@ -144,7 +147,7 @@ from sklearn.neighbors import KNeighborsRegressor
 
 X_train, X_test, y_train, y_test = train_test_split(X_R1, y_R1, random_state = 0)
 
-knnreg = KNeighborsRegressor(n_neighbors = 5).fit(X_train, y_train)
+knnreg = KNeighborsRegressor(n_neighbors = 9).fit(X_train, y_train)
 
 print(knnreg.predict(X_test))
 print(y_test) #TM
@@ -167,6 +170,7 @@ for thisaxis, K in zip(subaxes, [1, 3]):
     thisaxis.set_title('KNN regression (K={})'.format(K))
     thisaxis.legend()
 plt.tight_layout()
+plt.show()
 
 
 # ### Regression model complexity as a function of K
@@ -191,7 +195,8 @@ for thisaxis, K in zip(subaxes, [1, 3, 7, 15, 55]):
     thisaxis.set_title('KNN Regression (K={})\nTrain $R^2 = {:.3f}$,  Test $R^2 = {:.3f}$'
                       .format(K, train_score, test_score))
     thisaxis.legend()
-    plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+plt.show()
 
 
 # ## Linear models for regression
@@ -521,7 +526,7 @@ for this_C, subplot in zip([0.1, 1, 100], subaxes):
                                              X_test, y_test, title,
                                              subplot)
 plt.tight_layout()
-
+plt.show()
 
 # #### Application to real dataset
 
@@ -569,7 +574,7 @@ for this_C, subplot in zip([0.00001, 100], subaxes):
     plot_class_regions_for_classifier_subplot(clf, X_train, y_train,
                                              None, None, title, subplot)
 plt.tight_layout()
-
+plt.show()
 
 # #### Application to real dataset
 
@@ -655,7 +660,7 @@ for this_gamma, subplot in zip([0.01, 1.0, 10.0], subaxes):
     plot_class_regions_for_classifier_subplot(clf, X_train, y_train,
                                              None, None, title, subplot)
     plt.tight_layout()
-
+plt.show()
 
 # #### Support Vector Machine with RBF kernel: using both C and gamma parameter 
 
@@ -679,7 +684,7 @@ for this_gamma, this_axis in zip([0.01, 1, 5], subaxes):
                                                  X_test, y_test, title,
                                                  subplot)
         plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-
+plt.show()
 
 # ### Application of SVMs to a real dataset: unnormalized data
 
@@ -735,14 +740,14 @@ from sklearn.model_selection import validation_curve
 param_range = np.logspace(-3, 3, 4)
 train_scores, test_scores = validation_curve(SVC(), X, y,
                                             param_name='gamma',
-                                            param_range=param_range, cv=3)
-
+                                            param_range=param_range, cv=5)
 
 
 
 print(train_scores)
 
 print(test_scores)
+
 
 # This code based on scikit-learn validation_plot example
 #  See:  http://scikit-learn.org/stable/auto_examples/model_selection/plot_validation_curve.html
@@ -880,7 +885,50 @@ plt.tight_layout()
 
 plt.show()
 
+
 ##TERRENCE  work starts here
+
+from sklearn.model_selection import validation_curve
+
+param_range = [3,6,9]
+train_scores, test_scores = validation_curve(DecisionTreeClassifier(), X_cancer, y_cancer,
+                                            param_name='max_depth',
+                                            param_range=param_range, cv=5)
+
+print(train_scores)
+
+print(test_scores)
+
+plt.figure()
+
+train_scores_mean = np.mean(train_scores, axis=1)
+train_scores_std = np.std(train_scores, axis=1)
+test_scores_mean = np.mean(test_scores, axis=1)
+test_scores_std = np.std(test_scores, axis=1)
+
+plt.title('Validation Curve with Decision Trees')
+plt.xlabel('max depth')
+plt.ylabel('Score')
+plt.ylim(0.0, 1.1)
+lw = 2
+
+plt.semilogx(param_range, train_scores_mean, label='Training score',
+            color='darkorange', lw=lw)
+
+plt.fill_between(param_range, train_scores_mean - train_scores_std,
+                train_scores_mean + train_scores_std, alpha=0.2,
+                color='darkorange', lw=lw)
+
+plt.semilogx(param_range, test_scores_mean, label='Cross-validation score',
+            color='navy', lw=lw)
+
+plt.fill_between(param_range, test_scores_mean - test_scores_std,
+                test_scores_mean + test_scores_std, alpha=0.2,
+                color='navy', lw=lw)
+
+plt.legend(loc='best')
+plt.show()
+
 
 ##k-means clustering
 
@@ -940,6 +988,7 @@ bench_k_means(KMeans(init=pca.components_, n_clusters=n_digits, n_init=1),
               name="PCA-based",
               data=data)
 print(82 * '_')
+
 
 # #############################################################################
 # Visualize the results on PCA-reduced data
@@ -1023,6 +1072,7 @@ for name, est in estimators:
     ax.set_title(titles[fignum - 1])
     ax.dist = 12
     fignum = fignum + 1
+plt.show()
 
 # Plot the ground truth
 fig = plt.figure(fignum, figsize=(4, 3))
@@ -1051,6 +1101,7 @@ ax.dist = 12
 
 fig.show()
 
+
 ##Naive Bayes
 
 from sklearn import datasets
@@ -1060,6 +1111,7 @@ gnb = GaussianNB()
 y_pred = gnb.fit(iris.data, iris.target).predict(iris.data)
 print("Number of mislabeled points out of a total %d points : %d" % (iris.data.shape[0],(iris.target != y_pred).sum()))
 #Number of mislabeled points out of a total 150 points : 6
+
 
 ##EM-Algorithm
 
@@ -1090,3 +1142,4 @@ plt.contour(X, Y, Z)
 plt.scatter(X_train[:, 0], X_train[:, 1])
  
 plt.show()
+
