@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 np.set_printoptions(precision=2)
-
+'''
 
 fruits = pd.read_table('fruit_data_with_colors.txt')
 print(fruits.shape) #TM
@@ -62,7 +62,7 @@ print(knn.predict(example_fruit_scaled)[0]-1)  #TM
 #print(target_names_fruits[knn.predict(example_fruit_scaled)])  #TM
 print(target_names_fruits[knn.predict(example_fruit_scaled)[0]])  #TM
 print(target_names_fruits[knn.predict(example_fruit_scaled)[0]-1])  #TM
-
+'''
 
 # ## Datasets
 
@@ -121,7 +121,7 @@ cancer = load_breast_cancer()
 print(cancer.keys()) #TM
 
 (X_cancer, y_cancer) = load_breast_cancer(return_X_y = True)
-
+'''
 # Communities and Crime dataset
 #crime = load_crime_dataset() #TM
 #crime = pd.DataFrame(crime)  #TM
@@ -782,7 +782,7 @@ plt.fill_between(param_range, test_scores_mean - test_scores_std,
 plt.legend(loc='best')
 plt.show()
 
-
+'''
 # ## Decision Trees
 
 
@@ -887,7 +887,7 @@ plt.show()
 
 
 ##TERRENCE  work starts here
-
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import validation_curve
 
 param_range = [3,6,9]
@@ -948,9 +948,12 @@ digits = load_digits()
 data = scale(digits.data)
 
 n_samples, n_features = data.shape
+print(n_samples, n_features)
+
 n_digits = len(np.unique(digits.target))
 labels = digits.target
 
+print(n_digits, labels)
 sample_size = 300
 
 print("n_digits: %d, \t n_samples %d, \t n_features %d"
@@ -975,8 +978,10 @@ def bench_k_means(estimator, name, data):
                                       metric='euclidean',
                                       sample_size=sample_size)))
 
+
 bench_k_means(KMeans(init='k-means++', n_clusters=n_digits, n_init=10),
               name="k-means++", data=data)
+
 
 bench_k_means(KMeans(init='random', n_clusters=n_digits, n_init=10),
               name="random", data=data)
@@ -1032,6 +1037,7 @@ plt.yticks(())
 plt.show()
 
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 # Though the following import is not directly being used, it is required
@@ -1073,6 +1079,7 @@ for name, est in estimators:
     ax.dist = 12
     fignum = fignum + 1
 plt.show()
+
 
 # Plot the ground truth
 fig = plt.figure(fignum, figsize=(4, 3))
