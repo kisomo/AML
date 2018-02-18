@@ -2,12 +2,11 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 df = pd.read_csv('fraud_data.csv') #TM
 print(df.shape)  #TM
-print(df.head(3))  #TM
-_counts = df.iloc[:,-1].value_counts(ascending=True) #TM
-print(_counts) #TM
+print(df.isnull().values.any()) #TM
 
 # ### Question 1
 # Import the data from `fraud_data.csv`. What percentage of the observations in the dataset are instances of fraud?
@@ -16,14 +15,23 @@ print(_counts) #TM
 def answer_one():
     
     # Your code here
-    df = pd.read_csv('fraud_data.csv') #TM
-    a1 = df[df['Class'] != 0].sum()
-    a = len(a1)
-    b = len(df) - a
-    instances_of_fraud =  float (b/(a+b)) #356/(21337+356) # TM
-    return instances_of_fraud# Return your answer
+    frauds = df[df.Class == 1] #TM
+    normal = df[df.Class == 0] #TM
+    a = float(len(frauds)) #TM
+    b = float(len(normal)) #TM
+    instances_of_fraud =  a/(a+b) #356/(21337+356) # TM
+    return instances_of_fraud # Return your answer
 
 print(answer_one()*100)
+
+LABELS = ["Normal", "Fraud"]
+count_classes = pd.value_counts(df['Class'], sort = True)
+count_classes.plot(kind = 'bar', rot=0)
+plt.title("Transaction class distribution")
+plt.xticks(range(2), LABELS)
+plt.xlabel("Class")
+plt.ylabel("Frequency")
+plt.show()
 
 
 
@@ -55,18 +63,21 @@ def answer_two():
     dummy_majority = DummyClassifier(strategy = 'most_frequent').fit(X_train, y_train)
     y_majority_predicted = dummy_majority.predict(X_test)
     confusion = confusion_matrix(y_test, y_majority_predicted)
-    #print('Most frequent class (dummy classifier)\n', confusion)
+
     a = accuracy_score(y_test, y_majority_predicted)
     b = precision_score(y_test, y_majority_predicted)
     c = recall_score(y_test, y_majority_predicted)
     d = f1_score(y_test, y_majority_predicted)
+    e = confusion
     
-    
-    return a,b,c,d # Return your answer
+    return a,b,c,d, e # Return your answer
 
 print(answer_two())
 
-
+#TN = 5344
+#FP = 0
+#FN = 80
+#TP = 0
 
 # ### Question 3
 # 
@@ -82,21 +93,30 @@ def answer_three():
     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
     from sklearn.metrics import confusion_matrix
 
-    #svm = SVC(kernel='linear', C=1).fit(X_train, y_train)
-    svm = SVC(kernel='linear', C=1).fit(X_test, y_test)
+    #svm = SVC(kernel='linear', C=1).fit(X_test, y_test)
+    svm = SVC(kernel='linear', C=1).fit(X_train, y_train)
     svm_predicted = svm.predict(X_test)
     confusion = confusion_matrix(y_test, svm_predicted)
-    #print('Support vector machine classifier (linear kernel, C=1)\n', confusion)
+
     a = accuracy_score(y_test, svm_predicted)
     b = precision_score(y_test, svm_predicted)
     c = recall_score(y_test, svm_predicted)
     d = f1_score(y_test, svm_predicted)
-    
-    return a, b, c, d # Return your answer
+    e = confusion
+    return a, b, c, d, e # Return your answer
 
 print(answer_three())
-
 '''
+
+
+#(0.9961283185840708, 0.96825396825396826, 0.76249999999999996, 0.85314685314685312)
+#array([[5342,    2],
+#       [  19,   61]]))
+
+#TN = 5342
+#FP = 2
+#FN = 19
+#TP = 61
 
 # ### Question 4
 # Using the SVC classifier with parameters `{'C': 1e9, 'gamma': 1e-07}`, what is the confusion matrix when using a threshold of 
@@ -108,9 +128,9 @@ def answer_four():
     from sklearn.svm import SVC
 
     # Your code here
+    svm = SVC(kernel = 'rbf', C = 1e9, gamma = 1e-07).fit(X_train, y_train)
+    #svm = SVC(kernel = 'rbf', C = 1e9, gamma = 1e-07).fit(X_test, y_test)
     
-    svm = SVC(kernel = 'rbf', C = 1e9, gamma = 1e-07).fit(X_test, y_test)
-    #svm_predicted = svm.fit(X_test, y_test).decision_function(X_test)
     svm_predicted = svm.decision_function(X_test)
     svm_predicted[svm_predicted <= -220] = 0
     svm_predicted[svm_predicted > -220] = 1
@@ -121,6 +141,15 @@ def answer_four():
     return  conf # Return your answer
 
 print(answer_four())
+
+#[[   0 5344]
+# [   0   80]]
+
+#TN = 0
+#FP = 5344
+#FN = 0
+#TP = 80
+
 
 
 # ### Question 5
@@ -140,7 +169,7 @@ def answer_five():
     
     lr = LogisticRegression() #.fit(X_train, y_train)
     y_scores_lr = lr.fit(X_train, y_train).decision_function(X_test)
-    #y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
+    y_proba_lr = lr.fit(X_train, y_train).predict_proba(X_test)
     
     precision, recall, thresholds = precision_recall_curve(y_test, y_scores_lr)
     #precision, recall, thresholds = precision_recall_curve(y_test, y_proba_lr)
@@ -148,7 +177,6 @@ def answer_five():
     closest_zero_p = precision[closest_zero]
     closest_zero_r = recall[closest_zero]
     
-
 
     plt.figure()
     plt.xlim([0.0, 1.01])
@@ -160,14 +188,11 @@ def answer_five():
     plt.axes().set_aspect('equal')
     plt.show()
 
-
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     from sklearn.metrics import roc_curve, auc
     fpr_lr, tpr_lr, _ = roc_curve(y_test, y_scores_lr)
     roc_auc_lr = auc(fpr_lr, tpr_lr)
     
-
-
 
     plt.figure()
     plt.xlim([-0.01, 1.00])
@@ -181,13 +206,12 @@ def answer_five():
     plt.axes().set_aspect('equal')
     plt.show()
     
-    
 
     return 0.89,0.89 # Return your answer
 
 print(answer_five())
 
-
+'''
 
 # ### Question 6 
 # Perform a grid search over the parameters listed below for a Logisitic Regression classifier, using recall for 
@@ -260,3 +284,4 @@ def GridSearch_Heatmap(scores):
     
 GridSearch_Heatmap(answer_six())
 
+'''
