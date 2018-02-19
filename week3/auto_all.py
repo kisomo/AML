@@ -99,20 +99,19 @@ input_dim = X_train.shape[1]
 encoding_dim = 14
 
 input_layer = Input(shape=(input_dim, ))
-encoder = Dense(encoding_dim, activation="tanh", 
-                activity_regularizer=regularizers.l1(10e-5))(input_layer)
+encoder = Dense(encoding_dim, activation="tanh", activity_regularizer=regularizers.l1(10e-5))(input_layer)
 encoder = Dense(int(encoding_dim / 2), activation="relu")(encoder)
 decoder = Dense(int(encoding_dim / 2), activation='tanh')(encoder)
 decoder = Dense(input_dim, activation='relu')(decoder)
 autoencoder = Model(inputs=input_layer, outputs=decoder)
 
-nb_epoch = 100
+nb_epoch = 5 #100
 batch_size = 32
 
 autoencoder.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
 
 checkpointer = ModelCheckpoint(filepath="model.h5", verbose=0, save_best_only=True)
-'''
+
 tensorboard = TensorBoard(log_dir='./logs',
                           histogram_freq=0,
                           write_graph=True,
@@ -214,9 +213,9 @@ plt.ylabel('True class')
 plt.xlabel('Predicted class')
 plt.show()
 
-'''
-#+++++++++++++++++++++++++++++++++++ tflearn +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+#+++++++++++++++++++++++++++++++++++ tflearn +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'''
 from tflearn.layers.conv import conv_2d, max_pool_2d, avg_pool_2d
 from tflearn.layers.core import fully_connected, dropout, flatten
 
@@ -284,5 +283,203 @@ with tf.Session(graph=graph) as session:
             test_accuracy = accuracy(test_prediction.eval(), test_labels)
             message = "step {:04d} : loss is {:06.2f}, accuracy on training set {:02.2f} %, accuracy on test set {:02.2f} %".format(step, l, train_accuracy, test_accuracy)
             print(message)
+
+'''
+#++++++++++++++++++++++++++++++++++++++++ NAIVE BAYES +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import BernoulliNB, MultinomialNB, GaussianNB
+
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import confusion_matrix
+
+df = pd.read_csv('fraud_data.csv')
+
+X = df.iloc[:,:-1]
+y = df.iloc[:,-1]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+#Bernoulli
+BernNB = BernoulliNB(binarize = True)
+BernNB.fit(X_train, y_train)
+y_pred = BernNB.predict(X_test)
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+
+print("Bernoulli" ,acc, prec, rec, conf)
+
+'''
+#Multinomial
+MultiNB = MultinomialNB()
+MultiNB.fit(X_train, y_train)
+y_pred = MultiNB.predict(X_test)
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Mutinomial", acc, prec, rec, conf)
+'''
+
+#Gaussian
+GaussNB = GaussianNB()
+GaussNB.fit(X_train, y_train)
+y_pred = GaussNB.predict(X_test)
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+
+print("Gaussian", acc, prec, rec, conf)
+
+#Bernoulli
+BernNB = BernoulliNB(binarize = 0.1)
+BernNB.fit(X_train, y_train)
+y_pred = BernNB.predict(X_test)
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+
+print("Bernoulli" ,acc, prec, rec, conf)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++ K-means +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=2, random_state=0).fit(X_train)
+kmeans.labels_
+kmeans.predict(X_test)
+y_pred = kmeans.predict(X_test)
+kmeans.cluster_centers_
+#print(kmeans.score(res,y_test))
+#print(res)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("K-means" ,acc, prec, rec, conf)
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++ knn ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+k = X_train.shape[0]
+k = int(np.sqrt(k))
+from sklearn.neighbors import KNeighborsClassifier 
+model = KNeighborsClassifier(n_neighbors=k) 
+model.fit(X_train, y_train) 
+y_pred = model.predict(X_test) 
+#print(model.score(X_test, y_test))
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+
+print("K-nn" ,acc, prec, rec, conf)
+
+#+++++++++++++++++++++++++++++++++++++++++++ Nearest Centroid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from sklearn.neighbors.nearest_centroid import NearestCentroid
+clf = NearestCentroid()
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+print(clf.predict(X_test))
+print(clf.score(X_test,y_test))
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+
+print("Nearest Centroid" ,acc, prec, rec, conf)
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++ EM +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from sklearn.mixture import GaussianMixture
+gmm = GaussianMixture(n_components=2)
+gmm.fit(X_train)
+#print(gmm.means_)
+#print(gmm.covariances_)
+y_pred = gmm.predict(X_test)
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+print("EM" ,acc, prec, rec, conf)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ GB Classifier +++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+from sklearn.ensemble import GradientBoostingClassifier
+clf = GradientBoostingClassifier()
+clf = clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+#confusion = confusion_matrix(y_test, clf_predicted)
+#print(clf.score(X_test,y_test))
+#print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+print("GB Classifier" ,acc, prec, rec, conf)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++ SVC ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'''
+from sklearn.svm import SVC
+SVC_model = SVC(kernel = 'rbf', C = 10, gamma = 10)
+SVC_model = SVC_model.fit(X_train, y_train)
+y_pred = SVC_model.predict(X_test)
+#print(SVC_model.score(X_test,y_test))
+#print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+acc = accuracy_score(y_test,y_pred)
+prec = precision_score(y_test,y_pred)
+rec = recall_score(y_test,y_pred)
+conf = confusion_matrix(y_test, y_pred)
+print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
+print("SVC" ,acc, prec, rec, conf)
+
+'''
+#https://spark.apache.org/docs/2.2.0/mllib-linear-methods.html
+
+from pyspark.mllib.classification import SVMWithSGD, SVMModel
+from pyspark.mllib.regression import LabeledPoint
+
+# Load and parse the data
+def parsePoint(line):
+    values = [float(x) for x in line.split(' ')]
+    return LabeledPoint(values[0], values[1:])
+
+data = sc.textFile("data/mllib/sample_svm_data.txt")
+parsedData = data.map(parsePoint)
+
+# Build the model
+model = SVMWithSGD.train(parsedData, iterations=100)
+
+# Evaluating the model on training data
+labelsAndPreds = parsedData.map(lambda p: (p.label, model.predict(p.features)))
+trainErr = labelsAndPreds.filter(lambda lp: lp[0] != lp[1]).count() / float(parsedData.count())
+print("Training Error = " + str(trainErr))
+
+# Save and load model
+model.save(sc, "target/tmp/pythonSVMWithSGDModel")
+sameModel = SVMModel.load(sc, "target/tmp/pythonSVMWithSGDModel")
+
+
+
+
+
+
+
 
 
