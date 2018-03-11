@@ -325,6 +325,7 @@ conf = confusion_matrix(y_test, y_pred)
 print("Mutinomial", acc, prec, rec, conf)
 '''
 
+
 #Gaussian
 GaussNB = GaussianNB()
 GaussNB.fit(X_train, y_train)
@@ -434,6 +435,7 @@ conf = confusion_matrix(y_test, y_pred)
 print("Number of mislabeled points out of a total %d points : %d" % (X_test.shape[0],(y_test != y_pred).sum()))
 print("GB Classifier" ,acc, prec, rec, conf)
 
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++ SVC ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '''
 from sklearn.svm import SVC
@@ -450,8 +452,11 @@ print("Number of mislabeled points out of a total %d points : %d" % (X_test.shap
 print("SVC" ,acc, prec, rec, conf)
 
 '''
-#https://spark.apache.org/docs/2.2.0/mllib-linear-methods.html
 
+
+print("+++++++++++++++++++++++++++++++= spark ++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+#https://spark.apache.org/docs/2.2.0/mllib-linear-methods.html
+'''
 from pyspark.mllib.classification import SVMWithSGD, SVMModel
 from pyspark.mllib.regression import LabeledPoint
 
@@ -461,6 +466,8 @@ def parsePoint(line):
     return LabeledPoint(values[0], values[1:])
 
 data = sc.textFile("data/mllib/sample_svm_data.txt")
+print(data.shape)
+
 parsedData = data.map(parsePoint)
 
 # Build the model
@@ -474,10 +481,38 @@ print("Training Error = " + str(trainErr))
 # Save and load model
 model.save(sc, "target/tmp/pythonSVMWithSGDModel")
 sameModel = SVMModel.load(sc, "target/tmp/pythonSVMWithSGDModel")
+'''
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+#https://spark.apache.org/docs/2.2.0/api/python/pyspark.mllib.html#pyspark.mllib.classification.SVMWithSGD
 
+from pyspark.mllib.classification import LogisticRegressionModel, LogisticRegressionWithSGD
+from pyspark.mllib.classification import SVMWithSGD, SVMModel
+from pyspark.mllib.regression import LabeledPoint
+from pyspark import SparkFiles
 
+#from pyspark import SparkContext(master=None, appName=None, sparkHome=None, pyFiles=None,
+ #environment=None, batchSize=0, serializer=PickleSerializer(), conf=None, gateway=None, jsc=None, 
+ #profiler_cls=<class 'pyspark.profiler.BasicProfiler'>)
 
+from pyspark import SparkContext as sc
+
+data = [
+     LabeledPoint(0.0, [0.0, 1.0]),
+     LabeledPoint(1.0, [1.0, 0.0]),
+     ]
+lrm = LogisticRegressionWithSGD.train(sc.parallelize(data), iterations=10)
+print(lrm.predict([1.0, 0.0]))
+'''
+#1
+lrm.predict([0.0, 1.0])
+
+lrm.predict(sc.parallelize([[1.0, 0.0], [0.0, 1.0]])).collect()
+[1, 0]
+lrm.clearThreshold()
+lrm.predict([0.0, 1.0])
+
+'''
 
 
 

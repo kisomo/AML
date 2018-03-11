@@ -54,7 +54,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
 def answer_two():
     from sklearn.dummy import DummyClassifier
-    from sklearn.metrics import recall_score
     
     # Your code here
     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
